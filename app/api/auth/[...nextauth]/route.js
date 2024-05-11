@@ -1,10 +1,11 @@
 import User from "../../../../models/user";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connectMongoDB from "../../../../libs/db";
+//import authOptions from '../../../../lib/configs/auth/authOptions'
 
-export const authOptions = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -43,6 +44,7 @@ export const authOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions)
+export { handler as GET, handler as POST }
 
-export { handler as GET, handler as POST };
+
