@@ -12,7 +12,6 @@ import Modal from "../../components/Modal";
 import ShowAddress from "../../components/ShowAddress";
 import { ethers } from "ethers";
 import LandHeader from "../../components/LandHeader";
-import UploadFile from "../../components/UploadFie";
 const {Web3} = require('web3') ; 
 import {AuthProviders} from "../../app/Providers" ; 
 

@@ -1,5 +1,3 @@
-
-import {X, Trash2,SquarePlus,MinusSquare,ArrowBigUp,ArrowBigDown } from 'lucide-react' ; 
 import "semantic-ui-css/semantic.min.css";
 import Star from './StarRatingComponent';
 import { useEffect, useState } from 'react';
