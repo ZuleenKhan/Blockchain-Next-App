@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Form, FormField, Button, Container } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
+import axios from "axios";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");
@@ -23,32 +24,39 @@ export default function RegisterForm() {
     }
 
     try {
-      const resUserExists = await fetch("http://localhost:3000/api/userExists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      
+      const resUserExists = await axios.post("/api/userExists", { email });
+      const { user } = resUserExists.data;
+      // const resUserExists = await fetch("api/userExists", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ email }),
+      // });
 
-      const { user } = await resUserExists.json();
+      // const { user } = await resUserExists.json();
 
       if (user) {
         setError("User already exists.");
         return;
       }
-
-      const res = await fetch("https://blockchain-qo3satjh9-zuleenkhans-projects.vercel.app/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
+      const res = await axios.post("/api/register", {
+        name,
+        email,
+        password,
       });
+      // const res = await fetch("api/register", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     name,
+      //     email,
+      //     password,
+      //   }),
+      // });
 
       if (res.ok) {
         const form = e.target;
