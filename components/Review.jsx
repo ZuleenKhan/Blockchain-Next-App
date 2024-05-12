@@ -8,7 +8,7 @@ const Review = () => {
   const [reviews,setReviews] = useState([]) ; 
   useEffect(()=>{
     async function fetchUsers(){
-      const res = await fetch("http://localhost:3000/api/review",{cache : "no-store"})
+      const res = await fetch("https://blockchain-qo3satjh9-zuleenkhans-projects.vercel.app/api/review",{cache : "no-store"})
       setReviews(await res.json()) ; 
     }
     fetchUsers() ; 

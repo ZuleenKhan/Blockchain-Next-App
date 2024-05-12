@@ -15,7 +15,7 @@ function Reviewform() {
             return ; 
         }
         try {
-            await fetch('http://localhost:3000/api/review',{
+            await fetch('https://blockchain-qo3satjh9-zuleenkhans-projects.vercel.app/api/review',{
                   method:"POST",
                   headers:{
                         "Content-type":"application/json",
