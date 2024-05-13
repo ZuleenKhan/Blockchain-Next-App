@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
@@ -81,12 +80,7 @@ contract Campaign {
         requests[_index].complete = true;
         payable(requests[_index].recipient).transfer(requests[_index].value);
     }
-    function cancelRequest() public payable restricted {
-        //require(!approvers[msg.sender]) ;
-        for (uint i = 0; i < amount.length; i++) {
-            payable(apps[i]).transfer(amount[i]);
-        }
-    }
+ 
     function getSummary()
         public
         view
