@@ -1,3 +1,4 @@
+"use client"
 import "semantic-ui-css/semantic.min.css";
 import React, { useState } from 'react';
 import { Form, Input, Button, Message, Select, Container } from 'semantic-ui-react';
