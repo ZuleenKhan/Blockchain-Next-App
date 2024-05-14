@@ -1,14 +1,58 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
-contract CampaignFactory {
-    address payable[] public deployedCampaigns;
 
-    function createCampaign(uint minimum) public {
+enum Role {
+    Manager,
+    Approver,
+    Vendor
+}
+
+struct User {
+    address walletAddress;
+    Role role;
+    string name; // Optional: Add user's name for better identification
+}
+
+contract CampaignFactory {
+    // Mapping of deployed campaigns
+    address payable[] public deployedCampaigns;
+    // Mapping of users and their details
+    mapping(address => User) public users;
+     //     ["0xbc389"] => users.map()
+    // -> [1] => {"ds", 1, "0xgfgfrtg"} 
+    // -> [2] => {"ps", 1, "0xghgggggfrtg"}
+
+    //   constructor() public {} // Simple constructor
+
+    // Function to add a user
+    function addUser(
+        string memory _name,
+        address _walletAddress,
+        Role _role
+    ) public {
+        require(
+            users[_walletAddress].walletAddress == address(0),
+            "User already exists"
+        );
+        require(
+            _role == Role.Manager ||
+                _role == Role.Approver ||
+                _role == Role.Vendor,
+            "Invalid role"
+        );
+
+        users[_walletAddress] = User(_walletAddress, _role, _name);
+    }
+//   mapping ( address - > bool )  useExists ; 
+//             login - > [ grgf] 
+    // Function to create a campaign (restricted to Manager)
+    function createCampaign(uint minimum) public onlyRole(Role.Manager) {
         address newCampaign = address(new Campaign(minimum, msg.sender));
         deployedCampaigns.push(payable(newCampaign));
     }
 
+    // Function to get deployed campaigns
     function getDeployedCampaigns()
         public
         view
@@ -16,84 +60,105 @@ contract CampaignFactory {
     {
         return deployedCampaigns;
     }
+
+    // Verification modifier (any registered user can call functions with this)
+    modifier onlyRegistered() {
+        require(
+            users[msg.sender].walletAddress != address(0),
+            "User not registered"
+        );
+        _;
+    }
+
+    // Verification modifier (specific role required)
+    modifier onlyRole(Role _role) {
+        require(users[msg.sender].role == _role, "Unauthorized action");
+        _;
+    }
+
+    // ... Other functions for CampaignFactory requiring specific roles ...
 }
 
 contract Campaign {
     struct Request {
         string description;
-        uint256 value;
+        uint value;
         address recipient;
         bool complete;
-        uint256 approvalCount; // keep track of yes votes for request
+        uint approvalCount;
         mapping(address => bool) approvals;
     }
 
     Request[] public requests;
-    uint256[] private amount;
     address public manager;
-    uint256 public minimumContribution;
-    address[] private apps;
+    uint public minimumContribution;
+    mapping(address => bool) public approvers;
+    uint public approversCount;
 
     modifier restricted() {
         require(msg.sender == manager);
         _;
     }
 
-    mapping(address => bool) public approvers;
-    uint256 public approverCount;
-
-    constructor(uint256 minimum, address creator) {
+    constructor(uint minimum, address creator) {
         manager = creator;
         minimumContribution = minimum;
     }
+
     function contribute() public payable {
         require(msg.value > minimumContribution);
+
         approvers[msg.sender] = true;
-        amount.push(msg.value);
-        approverCount++;
-        apps.push(msg.sender);
+        approversCount++;
     }
 
     function createRequest(
-        string memory desc,
-        uint256 val,
-        address payable recep
-    ) public payable restricted {
-        // require(approvers[msg.sender]) ;
+        string memory description,
+        uint value,
+        address recipient
+    ) public restricted {
         Request storage newRequest = requests.push();
-
-        newRequest.description = desc;
-        newRequest.value = val;
-        newRequest.recipient = recep;
+        newRequest.description = description;
+        newRequest.value = value;
+        newRequest.recipient = recipient;
         newRequest.complete = false;
         newRequest.approvalCount = 0;
     }
-    function approveRequest(uint256 index) public {
+
+    function approveRequest(uint index) public {
+        Request storage request = requests[index];
+
         require(approvers[msg.sender]);
-        require(!requests[index].approvals[msg.sender]); // check whether person has voted already or not , if not then allow him to vote
-        requests[index].approvalCount++;
-        requests[index].approvals[msg.sender] = true;
+        require(!request.approvals[msg.sender]);
+
+        request.approvals[msg.sender] = true;
+        request.approvalCount++;
     }
-    function finalizeRequest(uint256 _index) public restricted {
-        require(requests[_index].approvalCount > (approverCount / 2));
-        require(!requests[_index].complete);
-        requests[_index].complete = true;
-        payable(requests[_index].recipient).transfer(requests[_index].value);
+
+    function finalizeRequest(uint index) public restricted {
+        Request storage request = requests[index];
+
+        require(request.approvalCount > (approversCount / 2));
+        require(!request.complete);
+
+        payable(request.recipient).transfer(request.value);
+        request.complete = true;
     }
- 
+
     function getSummary()
         public
         view
-        returns (uint256, uint256, uint256, uint256, address)
+        returns (uint, uint, uint, uint, address)
     {
         return (
             minimumContribution,
             address(this).balance,
             requests.length,
-            approverCount,
+            approversCount,
             manager
         );
     }
+
     function getRequestsCount() public view returns (uint) {
         return requests.length;
     }

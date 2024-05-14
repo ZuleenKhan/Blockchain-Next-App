@@ -6,9 +6,6 @@ import ContributeForm from "../../components/ContributeForm";
 import { Card, Button } from "semantic-ui-react";
 import { useRouter } from "next/router";
 
-//import Link from "next/link";
-//import { getSortedRoutes } from "next/dist/next-server/lib/router/utils";
-
 const CampaignShow = ({
   campaignAddress,
   minimumContribution,
@@ -20,8 +17,9 @@ const CampaignShow = ({
   const router = useRouter();
   const items = [
     {
-      header: "Manager Address",
-      meta:  `${manager}`,
+      header: "Campaign Owner",
+      //meta:  `${manager}`,
+      meta:"Maitray Jariwala",
       description:
         "The manager created this campaign and can create requests to withdraw this money",
       style: { overflowWrap: "break-word" },

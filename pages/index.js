@@ -1,49 +1,68 @@
-import "semantic-ui-css/semantic.min.css";
-const ethers = require("ethers") 
-
-import { useEffect, useState } from 'react';
-const {Web3} = require('web3') ; 
+"use client"
+import React, { useState } from "react";
+import { Form, Input, Button, Message, Container, Image } from "semantic-ui-react";
+import factory from "../ethereum/factory";
 import { useRouter } from "next/router";
-import { Container } from "semantic-ui-react";
-import LoginForm from "../components/LoginForm";
-//import { useLocalStorage } from "@uidotdev/usehooks";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+import { isValidAddress } from "ethereumjs-util";
+import "semantic-ui-css/semantic.min.css";
+import logo from "../public/images/crowdfunding.png";
+const LoginForm = () => {
+  const router = useRouter();
+  const [address, setAddress] = useState("");
+  const [error, setError] = useState("");
 
-function Modal_Show(){
-  useRouter().push("/logini/log");
-}  
-export default function CampaignLogin(){
-   
-   const [provider,setProvider] = useState(null) ; 
-   const [account, setAccount] = useState(null) ;
-   const [isConnected,setIsConnected] = useState(false) ;
-   async function connectToMetamask(){
-        if(window.ethereum){
-        try{
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          setProvider(provider) ; 
-          await provider.send("eth_requestAccounts",[]) ;
-           const signer = provider.getSigner() ; 
-           const address = await signer.getAddress() ; 
-           setAccount(address) ; 
-           window.localStorage.setItem("account",JSON.stringify(address)) ;
-           console.log("Metamask Connected : " + address) ; 
-           setIsConnected(true) ; 
-          } catch(err){
-            console.log(err) ;
-          }
-        } else {
-          console.log("Metamask is not detected in the browser")
-        }
-        
+  const handleLogin = async () => {
+    try {
+      // Fetch the User details for the entered address
+      if (!isValidAddress(address)) {
+        setError("Please enter a valid Ethereum address.");
+        return;
       }
-   return (<div >
-      <Container style={{display:"flex", justifyContent: "center", alignContent: "center", border: "solid 2px grey", marginTop:"100px"}}>
-      <LoginForm/>
-       </Container>
-       </div >
-   )
+      const user = await factory.methods.users(address).call();
+      if (user.walletAddress === address) {
+        // Address matches, redirect or perform login action
+        // You can handle login logic here
+        router.push("/logini/log"); // Redirect to dashboard after successful login
+      } else {
+        setError("User does not exist. Please register.");
+     
+      }
+    } catch (err) {
+      // Handle errors
+      console.error("Error:", err);
+      setError("Error occurred. Please try again.");
+    }
+  };
+function handleClick (){
+     router.push("/logini/pp") ; 
 }
+  return (
+    <div>
+    <Container style={{marginTop:"150px", border: "solid 2px black", padding:"20px"}}>
+      <h1>Login</h1>
+      
+    <Form error={Boolean(error)} onSubmit={handleLogin} style={{marginTop : "100px"
+    }}>
+      <Form.Field>
+        <label>Enter Your Address:</label>
+        <Input focus fluid 
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+      </Form.Field>
+      <Button  style={{margin:"2px"}} color="black" fluid  type="submit" primary>
+        Login
+      </Button>
+      <Message error header="Error" content={error} />
+      
+    </Form>
+    <Button  style={{margin:"2px"}} fluid type="submit" primary  onClick={ handleClick }>
+          Register
+  </Button>
+  </Container>
+  </div>
+  );
+};
 
+export default LoginForm;

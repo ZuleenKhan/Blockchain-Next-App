@@ -1,34 +1,34 @@
 import "semantic-ui-css/semantic.min.css";
-import Star from './StarRatingComponent';
 import { useEffect, useState } from 'react';
-import StarRatingComponent from './StarRatingComponent';
-
+import axios from "axios";
 
 const Review = () => {
   const [reviews,setReviews] = useState([]) ; 
   useEffect(()=>{
     async function fetchUsers(){
-      const res = await fetch("api/review",{cache : "no-store"})
-      setReviews(await res.json()) ; 
+      try{
+        const res = await fetch("http://localhost:3000/api/review",{cache : "no-store"})
+        setReviews(await res.json()) ; 
+      }catch(error){console.log(error.response.data) ; }
     }
     fetchUsers() ; 
-  },[]) ; 
+  },[]); 
 
   return (
-    <>
+    <div style={{overflowWrap:"break-word" , width:"fit-content" , blockSize:"fit-content"}}>
     { reviews && reviews?.review?.map((review) => (
-      <div style={{overflowWrap:"break-word"}}>
-            <div style={{border:"solid 2px grey", padding:"3px", marginBottom: "6px"}}>
+      <div style={{overflowWrap:"break-word", width:"fit-content", blockSize:"fit-content"}}>
+            <div style={{border:"solid 2px grey",padding:"3px", marginBottom: "6px", width:"fit-content", blockSize:"fit-content"}}>
              
-               <div style={{overflowWrap:"break-word"}}> 
-                      { <p style={{overflowWrap:"break-word"}} key={review.id}>{review.title}</p> 
+               <div style={{overflowWrap:"break-word" , width:"fit-content" , blockSize:"fit-content"}}> 
+                      { <p style={{overflowWrap:"break-word", width:"fit-content", blockSize:"fit-content"}} key={review.id}>{review.title}</p> 
                    }
                       </div>
             </div>
 
            </div>
              ))}
-    </>
+    </div>
   )
 }
 

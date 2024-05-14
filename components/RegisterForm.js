@@ -1,118 +1,75 @@
-"use client";
-
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Form, FormField, Button, Container } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
-import axios from "axios";
+import React, { useState } from 'react';
+import { Form, Input, Button, Message, Select, Container } from 'semantic-ui-react';
+import factory from '../ethereum/factory';
+import { useRouter } from 'next/router';
+import { isValidAddress } from 'ethereumjs-util';
 
-export default function RegisterForm() {
+
+const roleOptions = [
+  { key: 'm', value: 0, text: 'Manager' }, // Manager is 0
+  { key: 'a', value: 1, text: 'Approver' }, // Approver is 1
+  { key: 'v', value: 2, text: 'Vendor' }   // Vendor is 2
+];
+const RegisterForm = () => {
+  const router = useRouter();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
 
-  const router = useRouter();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!name || !email || !password) {
-      setError("All fields are necessary.");
-      return;
-    }
-
+  const handleRegister = async () => {
     try {
-      
-      const resUserExists = await axios.post("/api/userExists", { email });
-      const { user } = resUserExists.data;
-      // const resUserExists = await fetch("api/userExists", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ email }),
-      // });
-
-      // const { user } = await resUserExists.json();
-
-      if (user) {
-        setError("User already exists.");
+      if (!isValidAddress(address)) {
+        setError("Please enter a valid Ethereum address.");
         return;
       }
-      const res = await axios.post("/api/register", {
-        name,
-        email,
-        password,
-      });
-      // const res = await fetch("api/register", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     name,
-      //     email,
-      //     password,
-      //   }),
-      // });
-
-      if (res.ok) {
-        const form = e.target;
-        form.reset();
-        router.push("/");
-      } else {
-        console.log("User registration failed.");
-      }
-    } catch (error) {
-      console.log("Error during registration: ", error);
+      await factory.methods.addUser(name, address, role).send({ from: address });
+      
+      // If no error and transaction succeeds
+      router.push("/dashboard"); // Redirect to dashboard or confirmation page
+    } catch (err) {
+      console.error("Error:", err);
+      setError("Registration failed. Please try again.");
     }
   };
 
   return (
-    <Container style={{display:"flex", justifyContent: "center", alignContent: "center", border: "solid 2px grey", marginTop:"100px"}}>
-      <div >
-        <h1>Register</h1>
-        <Form onSubmit={handleSubmit} style={{width: "600px"}}> 
-        <FormField>
-        <input
+    <Container style={{marginTop:"150px", border: "solid 2px black", padding:"20px"}}> 
+      <h1>Register</h1>
+      <Form error={Boolean(error)} onSubmit={handleRegister} >
+        <Form.Field>
+          <label>Name:</label>
+          <Input
+            placeholder="Your Name"
+            value={name}
             onChange={(e) => setName(e.target.value)}
-            type="text"
-            placeholder="Full Name"
           />
-
-        </FormField>
-
-    <FormField>
-      <label>Email</label>
-      <input
-            onChange={(e) => setEmail(e.target.value)}
-            type="text"
-            placeholder="Email"
+        </Form.Field>
+        <Form.Field>
+          <label>Ethereum Address:</label>
+          <Input
+            placeholder="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
           />
-    </FormField>
-    <FormField>
-      <label>Password</label>
-      <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="Password"
+        </Form.Field>
+        <Form.Field>
+          <label>Role:</label>
+          <Select
+            placeholder="Select your role"
+            options={roleOptions}
+            onChange={(e, { value }) => setRole(value)}
           />
-    </FormField>
-   
-    <Button color="black" fluid type='submit'>Register</Button>
-    {error && (
-            <div>
-              {error}
-            </div>
-          )}
-          <Link href={"/"}>
-            Already have an account? <span >Login</span>
-          </Link>
-  </Form>
-        
-    </div>
+         
+        </Form.Field>
+        <Button type="submit" primary>
+          Register
+        </Button>
+        <Message error header="Error" content={error} />
+      </Form>
     </Container>
   );
-}
+};
+
+export default RegisterForm;

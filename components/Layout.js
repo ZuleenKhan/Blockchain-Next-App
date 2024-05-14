@@ -7,7 +7,6 @@ import Footer from './Footer'
 export default function Layout(props) {
   return (
     <Container>
-       <Icon name='hospital outline' size ='huge' style={{float:"left"}} />
         <TopHeader/>
       {props.children}
       <Footer/>

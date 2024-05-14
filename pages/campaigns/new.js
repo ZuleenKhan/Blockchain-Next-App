@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Message, Icon } from "semantic-ui-react";
 import { useRouter } from "next/router";
@@ -5,6 +6,7 @@ import Layout from "../../components/Layout";
 import factory from "../../ethereum/factory";
 import web3 from "../../ethereum/web3";
 import "semantic-ui-css/semantic.min.css";
+import DateInputForm from "../../components/DateInputForm";
 
 
 const INITIAL_TRANSACTION_STATE = {
@@ -79,6 +81,7 @@ const CampaignNew = (props) => {
 
   return (
     <Layout>
+      
       <h1>Create a Campaign</h1>
       <Form onSubmit={onSubmit}>
         <Form.Field>
@@ -93,13 +96,26 @@ const CampaignNew = (props) => {
             value={minumumContribution}
             onChange={(e) => setMinimumContribution(e.target.value)}
           />
-          
+         
         </Form.Field>
-        <Button color="teal" disabled={Boolean(loading)}>
+        <Form.Field>
+          <label>Campaign Title</label>
+          <Input placeholder="Enter Title for your Campaign"/>
+          </Form.Field>
+          <Form.Field>
+          <label>Campaign Idea</label>
+          <Input placeholder="Describe your Campaign"/>
+          </Form.Field>
+          <Form.Field>
+
+        <DateInputForm/>
+          </Form.Field>
+        <Button color="teal" disabled={Boolean(loading)} style={{marginBottom:"10px"}}>
           Create!
         </Button>
       </Form>
       {Boolean(loading || error || success) && renderMessage()}
+      
     </Layout>
   );
 };

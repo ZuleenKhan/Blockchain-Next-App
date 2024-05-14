@@ -297,7 +297,7 @@ RequestIndex.getInitialProps = async (props) => {
         return campaign.methods.requests(index).call();
       })
   );
-  let approversCount = await campaign.methods.approverCount().call();
+  let approversCount = await campaign.methods.approversCount().call();
   return { campaignAddress, requests, requestCount, approversCount };
 };
 

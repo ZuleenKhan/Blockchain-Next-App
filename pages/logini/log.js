@@ -1,4 +1,4 @@
-"use client"
+
 import React, { useState, useEffect } from "react";
 import "semantic-ui-css/semantic.min.css";
 import { Card, Button, Icon, ButtonOr, Container } from "semantic-ui-react";
@@ -15,6 +15,11 @@ import LandHeader from "../../components/LandHeader";
 const {Web3} = require('web3') ; 
 import {AuthProviders} from "../../app/Providers" ; 
 
+const currDate = new Date().toLocaleDateString();
+const currTime = new Date().toLocaleTimeString();
+const currentDateTime = new Date();
+const futureDateTime = new Date(currentDateTime);
+futureDateTime.setFullYear(futureDateTime.getFullYear() + 2);
 function CampaignIndex({ campaigns }) {
      
   
@@ -24,13 +29,25 @@ function CampaignIndex({ campaigns }) {
   console.log("campaigns", campaigns);
   
   const items = campaigns.map((campaignAddress) => {
-    console.log(campaignAddress);
     return {
-      header: campaignAddress,
+      header:"Powering the Future: Energizing EV Cycles - Join Our Campaign to Fund Sustainable Batteries!",
+      meta: (<strong style={{padding:"1px"}}>Our campaign aims to revolutionize transportation by funding eco-friendly batteries for
+      electric cycles, reducing carbon footprint and promoting clean energy. 
+      Together, let's pave the way for a greener tomorrow, one pedal at a time!</strong>
+      ),
       description: (
+        <div>
+        <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between"}}>
+      <p style={{color:'grey', marginTop:"5px" }}> Campaign Created at : <br/> {currDate} , {currTime} </p>  
+      <div><p style={{color:'grey', paddingBottom:"4px"}}> Campaign Valid Upto : <br/> {futureDateTime.toLocaleString()}  <br/> 
+         </p> 
+        </div>
+        </div>
+
         <Link legacyBehavior href={`/campaigns/${campaignAddress}`}>
-          <a>View campaign</a>
+          <a><br/>View campaign</a>
         </Link>
+        </div>
       ),
       fluid: true,
     };
