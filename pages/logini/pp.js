@@ -1,3 +1,4 @@
+"use cient"
 import React from 'react'
 import UserProfile from '../../components/UserProfile'
 import RegisterForm from '../../components/RegisterForm'
