@@ -19,11 +19,6 @@ contract CampaignFactory {
     address payable[] public deployedCampaigns;
     // Mapping of users and their details
     mapping(address => User) public users;
-     //     ["0xbc389"] => users.map()
-    // -> [1] => {"ds", 1, "0xgfgfrtg"} 
-    // -> [2] => {"ps", 1, "0xghgggggfrtg"}
-
-    //   constructor() public {} // Simple constructor
 
     // Function to add a user
     function addUser(

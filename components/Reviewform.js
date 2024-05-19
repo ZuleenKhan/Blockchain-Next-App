@@ -7,6 +7,7 @@ import axios from 'axios';
 function Reviewform() {
     const [title,setTitle] = useState("") ;
     const [description,setDescription] = useState("") ;
+    
     const handleSubmit = async(e) =>{
       console.log("SD"); 
       e.preventDefault() ; 
@@ -15,7 +16,7 @@ function Reviewform() {
           return ; 
       }
       try {
-          await fetch('http://localhost:3000/api/review',{
+          await fetch('/api/review',{
                 method:"POST",
                 headers:{
                       "Content-type":"application/json",
@@ -27,8 +28,7 @@ function Reviewform() {
 
   return (
     <div>
-    <Form onSubmit={handleSubmit}>
-      {/* <Star onChange={ (e)=>{setDescription(e.target.value); value={description} }}/> */}  
+    <Form onSubmit={handleSubmit}> 
     <TextArea onChange={(e)=>setTitle(e.target.value)} rows={5} placeholder='Tell us more' 
          value={title}
 

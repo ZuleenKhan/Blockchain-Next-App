@@ -14,7 +14,6 @@ export async function GET() {
    await connectMongoDB() ;
    const review = await Topic.find() ; 
    return NextResponse.json({review}) ; 
-
 }
 export async function DELETE(request) {
     const id = request.nextUrl.searchParams.get("id") ; 

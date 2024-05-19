@@ -8,55 +8,74 @@ import web3 from "../../ethereum/web3";
 import "semantic-ui-css/semantic.min.css";
 import DateInputForm from "../../components/DateInputForm";
 
-
 const INITIAL_TRANSACTION_STATE = {
   loading: "",
   error: "",
   success: "",
 };
 
-//Hosts the top level layout of our app
 const CampaignNew = (props) => {
   const router = useRouter();
-  const [minumumContribution, setMinimumContribution] = useState("");
-  const [transactionState, setTransactionState] = useState(
-    INITIAL_TRANSACTION_STATE
-  );
-  const { loading, error, success } = transactionState;
-
+  const [minimumContribution, setMinimumContribution] = useState("");
+  const [campaignTitle, setCampaignTitle] = useState("");
+  const [campaignDescription, setCampaignDescription] = useState("");
+  const [campaignValidity, setCampaignValidity] = useState({
+    year: "",
+    month: "",
+    day: ""
+  });
+  const [transactionState, setTransactionState] = useState(INITIAL_TRANSACTION_STATE);
+const { loading, error, success } = transactionState;
   const onSubmit = async (event) => {
     event.preventDefault();
-    //There's definitely a better way to use loading,error,success surely
+
     setTransactionState({
       ...INITIAL_TRANSACTION_STATE,
       loading: "Transaction is processing....",
     });
+
     const accounts = await web3.eth.getAccounts();
     await factory.methods
-      .createCampaign(minumumContribution)
+      .createCampaign(minimumContribution)
       .send({
         from: accounts[0],
       })
-      .then((res) => {
-        console.log(res); 
-        const etherscanLink = `https://sepolia.infura.io/v3/${res.transactionHash}`;
-        setTransactionState({
-          ...INITIAL_TRANSACTION_STATE,
-          success: (
-            <a href={etherscanLink} target="_blank">
-              View the transaction on Etherscan
-            </a>
-          ),
+      .then(async (res) => {
+        const response = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campaignTitle,
+            campaignDescription,
+            campaignValidity,
+          }),
         });
-        router.push("/logini/log");
+
+        if (response.ok) {
+          setTransactionState({
+            ...INITIAL_TRANSACTION_STATE,
+            success: (
+              <a
+href={`https://sepolia.infura.io/v3/${res.transactionHash}`}
+target="_blank">
+                View the transaction on Etherscan
+              </a>
+            ),
+          });
+          router.push("/logini/log");
+        } else {
+          throw new Error("Error saving campaign data");
+        }
       })
       .catch((err) => {
-        console.log(err);
         setTransactionState({
           ...INITIAL_TRANSACTION_STATE,
           error: err.message,
         });
       });
+
     setMinimumContribution("");
   };
 
@@ -78,44 +97,69 @@ const CampaignNew = (props) => {
       </Message>
     );
   };
-
   return (
     <Layout>
-      
       <h1>Create a Campaign</h1>
       <Form onSubmit={onSubmit}>
         <Form.Field>
-          <label>Minumum Contribution</label>
+          <label>Minimum Contribution</label>
           <Input
             label="wei"
             labelPosition="right"
             focus
-            type="number" // enforce number only content
-            min="0" //enforce positive numbers only
-            disabled={Boolean(loading)} //disable input if loading
-            value={minumumContribution}
+            type="number"
+            min="0"
+            disabled={Boolean(loading)}
+            value={minimumContribution}
             onChange={(e) => setMinimumContribution(e.target.value)}
           />
-         
         </Form.Field>
         <Form.Field>
           <label>Campaign Title</label>
-          <Input placeholder="Enter Title for your Campaign"/>
-          </Form.Field>
-          <Form.Field>
+          <Input
+            placeholder="Enter Title for your Campaign"
+            value={campaignTitle}
+            onChange={(e) => setCampaignTitle(e.target.value)}
+          />
+        </Form.Field>
+        <Form.Field>
           <label>Campaign Idea</label>
-          <Input placeholder="Describe your Campaign"/>
+          <Input
+            placeholder="Describe your Campaign"
+            value={campaignDescription}
+            onChange={(e) => setCampaignDescription(e.target.value)}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Campaign Validity</label>
+          <Input
+            placeholder="Year"
+            type="number"
+            value={campaignValidity.year}
+            onChange={(e) => setCampaignValidity({...campaignValidity, year: e.target.value })}
+          />
           </Form.Field>
           <Form.Field>
-
-        <DateInputForm/>
+          <Input
+            placeholder="Month"
+            type="number"
+            value={campaignValidity.month}
+            onChange={(e) => setCampaignValidity({...campaignValidity, month: e.target.value })}
+          />
           </Form.Field>
-        <Button color="teal" disabled={Boolean(loading)} style={{marginBottom:"10px"}}>
+          <Form.Field>
+          <Input
+            placeholder="Day"
+            type="number"
+            value={campaignValidity.day}
+            onChange={(e) => setCampaignValidity({...campaignValidity, day: e.target.value })}
+          />
+        </Form.Field>
+        <Button color="teal" disabled={Boolean(loading)} style={{marginBottom: "10px" }}>
           Create!
         </Button>
       </Form>
       {Boolean(loading || error || success) && renderMessage()}
-      
     </Layout>
   );
 };

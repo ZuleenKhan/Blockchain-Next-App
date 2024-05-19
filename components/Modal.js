@@ -39,7 +39,8 @@ function ModalScrollingExample() {
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
-      trigger={<Button color='teal'size="large" >Show Manager Review</Button>}
+      trigger={<Button color='teal'size="large" >  <Icon name="add user" />
+      {"   "} Reviews </Button>}
     >
       <ModalHeader>Manager Review</ModalHeader>
       <ModalContent  style={{display:"flex",flexWrap:"wrap",overflowWrap:"break-word" }} image>
@@ -75,8 +76,3 @@ function ModalScrollingExample() {
 }
 
 export default ModalScrollingExample
-
-{/* <div className="App">
-            <ButtonComponent handleClick={handleClick} />
-            {showMain && <MainComponent />}
-        </div> */}

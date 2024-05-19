@@ -5,8 +5,6 @@ import React from 'react'
 import { Dropdown, Icon } from 'semantic-ui-react'
 import UserProfile from './UserProfile';
 
-
- 
 const trigger = (
   <span>
     <Icon name='user' /> 

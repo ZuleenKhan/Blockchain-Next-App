@@ -1,13 +1,12 @@
 import "semantic-ui-css/semantic.min.css";
 import { useEffect, useState } from 'react';
-import axios from "axios";
 
 const Review = () => {
   const [reviews,setReviews] = useState([]) ; 
   useEffect(()=>{
     async function fetchUsers(){
       try{
-        const res = await fetch("http://localhost:3000/api/review",{cache : "no-store"})
+        const res = await fetch("/api/review",{cache : "no-store"})
         setReviews(await res.json()) ; 
       }catch(error){console.log(error.response.data) ; }
     }
