@@ -5,7 +5,7 @@ import factory from "../ethereum/factory";
 import { useRouter } from "next/router";
 import { isValidAddress } from "ethereumjs-util";
 import "semantic-ui-css/semantic.min.css";
-import logo from "../public/images/crowdfunding.png";
+
 
 const LoginForm = () => {
   const router = useRouter();
