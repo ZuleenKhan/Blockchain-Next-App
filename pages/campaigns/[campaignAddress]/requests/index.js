@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Table, Message, Icon } from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
+import { Button, Table, Message, Icon, Modal, ModalHeader } from "semantic-ui-react";
 import { useRouter } from "next/router";
 import Layout from "../../../../components/Layout"     
 import Campaign from "../../../../ethereum/campaign";
@@ -23,11 +23,21 @@ const RequestIndex = ({
   const [transactionState, setTransactionState] = useState(
     INITIAL_TRANSACTION_STATE
   );
+  const [reviews,setReviews] = useState([]) ; 
+  useEffect(()=>{
+    async function fetchUsers(){
+      try{
+        const res = await fetch("/api/review",{cache : "no-store"})
+        setReviews(await res.json()) ; 
+      }catch(error){console.log(error.response.data) ; }
+    }
+    fetchUsers() ; 
+  },[]); 
   const { Header, Row, Body, Cell, HeaderCell } = Table;
   const { loading, error, success } = transactionState;
   // const headers = ['ID', 'Description']
   console.log(campaignAddress, requests, approversCount, requestCount);
-
+  const [open, setOpen] = React.useState(false);
   // move the 2 actions into one function really with state for approve or finalise
   const onApprove = async (id) => {
     const campaign = Campaign(campaignAddress);
@@ -282,6 +292,16 @@ const RequestIndex = ({
         </Body>
       </Table>
       {Boolean(loading || error || success) && renderMessage()}
+    
+      <Modal style={{display:"flex",flexWrap:"wrap",overflowWrap:"break-word" }}
+      open={open}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      trigger={<Button color='teal'size="large" >  <Icon name="add user" />
+      {"   "} Verify Vendor </Button>}
+      >
+      <ModalHeader>{ reviews?.review?.map((review) => ( <a key={review.id}> {review.description} </a>)) }</ModalHeader>
+      </Modal>
     </Layout>
   );
 };

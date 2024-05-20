@@ -30,7 +30,6 @@ const DropdownRight = () => {
       ),
       disabled: true,
     },
-    { key: 'profile', text: 'Profile', onClick: handleClick },
    
     { key: 'sign-out', text: 'Sign Out' , onClick: takeback},
   ];

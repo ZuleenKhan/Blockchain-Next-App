@@ -49,7 +49,7 @@ const LoginForm = () => {
   };
 
   const handleRegisterClick = () => {
-    router.push("/register");
+    router.push("/logini/pp");
   };
 
   return (
